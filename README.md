@@ -22,7 +22,7 @@ All of the action is currently in the `src/auth` folder.
 
 ## Questions, Comments, Feedback
 
-[https://twitter.com/adamcowley](Drop me a message on twitter) or open an issue in this repo.  Any feedback or PRs are greatly appreciated.
+[Drop me a message on twitter](https://twitter.com/adamcowley) or open an issue in this repo.  Any feedback or PRs are greatly appreciated.
 
 
 <!-- ## Dependencies
