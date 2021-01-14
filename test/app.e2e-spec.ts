@@ -25,6 +25,8 @@ describe('AppController (e2e)', () => {
 
     describe('/auth', () => {
         let email = `${Math.random()}@neo4j.com`
+        let firstName = 'Adam'
+        let lastName = 'Cowley'
         let password = 'letmein'
         let token
 
@@ -39,10 +41,12 @@ describe('AppController (e2e)', () => {
             it('should create a user and return a JWT token', () => {
                 return request(api)
                     .post('/auth/register')
-                    .send({ email, password })
+                    .send({ email, password, firstName, lastName })
                     .expect(201)
                     .expect(res => {
                         expect(res.body.email).toEqual(email)
+                        expect(res.body.firstName).toEqual(firstName)
+                        expect(res.body.lastName).toEqual(lastName)
                         expect(res.body.password).toBeUndefined()
                         expect(res.body.token).toBeDefined()
                         token = res.body.token
@@ -100,7 +104,7 @@ describe('AppController (e2e)', () => {
                     .expect(401)
             })
 
-            it('should return forbidden on incorrect token', () => {
+            it('should return user information with valid token', () => {
                 return request(api)
                     .get('/auth/user')
                     .set({ Authorization: `Token ${token}` })
@@ -134,7 +138,7 @@ describe('AppController (e2e)', () => {
                     .expect(400)
             })
 
-            it('should return forbidden on incorrect token', () => {
+            it('should return unauthorised on incorrect token', () => {
                 const newEmail = `${Math.random()}@neo4j.com`
                 const firstName = 'Adam'
                 const lastName = 'Cowley'
@@ -143,7 +147,7 @@ describe('AppController (e2e)', () => {
                     .put('/auth/user')
                     .set({ Authorization: `Token ${token}` })
                     .send({ email: newEmail, firstName, lastName })
-                    .expect(200)
+                    .expect(401)
                     .expect(res => {
                         expect(res.body.email).toEqual(newEmail)
                         expect(res.body.firstName).toEqual(firstName)

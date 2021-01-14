@@ -1,6 +1,31 @@
-# Nest & Neo4j Starter Repository
+# Nest OGM Experiments
 
-## Dependencies
+## Getting Started:
+
+Clone [neode-ogm](https://github.com/adam-cowley/neode-ogm) locally and run `npm link` to create a local link:
+
+```
+git clone https://github.com/adam-cowley/neode-ogm
+npm i
+npm link
+```
+
+Then in this project directory, run:
+
+```
+npm link neodegm
+```
+
+After that, run `npm run start:dev`.
+
+All of the action is currently in the `src/auth` folder.
+
+## Questions, Comments, Feedback
+
+[https://twitter.com/adamcowley](Drop me a message on twitter) or open an issue in this repo.  Any feedback or PRs are greatly appreciated.
+
+
+<!-- ## Dependencies
 
 - **API:** `@nest` ...
 - **Neo4j:** `nest-neo4j`
@@ -58,4 +83,4 @@ getUser(@AuthUser() user) {
         token: this.authService.createToken(user),
     }
 }
-```
+``` -->

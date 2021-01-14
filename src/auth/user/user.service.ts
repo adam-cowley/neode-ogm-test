@@ -1,5 +1,6 @@
-import { Injectable } from "@nestjs/common";
-import { Neo4jService } from "nest-neo4j/dist";
+import { BadRequestException, Injectable } from "@nestjs/common";
+import Neode from "neodegm";
+
 import { CreateUserDto } from "../dto/create-user.dto";
 import { UpdateUserDto } from "../dto/update-user.dto";
 import { EncryptionService } from "../encryption/encryption.service";
@@ -9,39 +10,35 @@ import { User } from "./user.entity";
 export class UserService {
 
     constructor(
-        private readonly neo4jService: Neo4jService,
+        private readonly neode: Neode,
         private readonly encryptionService: EncryptionService
     ) {}
 
     find(email: any): Promise<User | undefined> {
-        return this.neo4jService.read(`
-            MATCH (u:User {email: $email})
-            RETURN u
-        `, { email })
-        .then(res => res.records.length ? new User(res.records[0].get('u')) : undefined)
+        return this.neode.getFirst<User>(User, { email })
     }
 
-    async create(user: CreateUserDto): Promise<User> {
-        // Encrypt Password
-        const password = await this.encryptionService.hash(user.password)
+    async create(userDto: CreateUserDto): Promise<User> {
+        try {
+            // Encrypt Password
+            const password = await this.encryptionService.hash(userDto.password)
 
-        return this.neo4jService.write(`
-            CREATE (u:User { id: randomUUID() })
-            SET u += $properties
-            RETURN u
-        `, { properties: {
-            ...user,
-            password,
-        } })
-            .then(res => new User(res.records[0].get('u')))
+            const user = User.create(userDto.email, password, userDto.firstName, userDto.lastName)
+
+            return this.neode.save(user)
+        }
+        catch (e) {
+            throw new BadRequestException(e.message)
+        }
     }
 
-    update(id: string, properties: UpdateUserDto): Promise<User> {
-        return this.neo4jService.write(`
-            MATCH (u:User { id: $id })
-            SET u += $properties
-            RETURN u
-        `, { id, properties })
-            .then(res => new User(res.records[0].get('u')))
+    async update(id: string, properties: UpdateUserDto): Promise<User> {
+        const user = await this.neode.find<User>(User, id)
+
+        user.setEmail(properties.email)
+        user.setFirstName(properties.firstName)
+        user.setLastName(properties.lastName)
+
+        return this.neode.save(user)
     }
 }
