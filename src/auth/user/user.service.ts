@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
-import Neode from "neodegm";
+import Neode, { Repository } from "neodegm";
+import { InjectRepository } from "../../ogm/decorators/inject-repository.decorator";
 
 import { CreateUserDto } from "../dto/create-user.dto";
 import { UpdateUserDto } from "../dto/update-user.dto";
@@ -15,6 +16,8 @@ export class UserService {
     ) {}
 
     find(email: any): Promise<User | undefined> {
+        // console.log(this.userRepository);
+
         return this.neode.getFirst<User>(User, { email })
     }
 
