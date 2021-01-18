@@ -17,3 +17,9 @@ export function createNeodeProviders(entities: Function[], database?: string) {
         }
     })
 }
+
+export function getRepository<Entity extends Function>(neode: Neode, entity: Entity, database?: string) {
+    const token = getRepositoryToken(entity, database)
+
+    return repositories.has(token) ? repositories.get(token) : neode.getRepository(entity, database)
+}
