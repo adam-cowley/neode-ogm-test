@@ -16,7 +16,7 @@ export class NeodeService {
 
         if ( !tx ) {
             console.warn(`There is no transaction set against the request, so chances are the transaction used by the \`${entity}\` repository will not be committed.  Have you added the \`NeodeInterceptor\` to your controller or request?`)
-            tx = this.request.transaction = this.neode.openTransaction(database)
+            tx = this.request.transaction = this.neode.openReadTransaction(database)
         }
 
         return tx.getRepository(entity, database) as T

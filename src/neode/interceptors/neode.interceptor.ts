@@ -9,8 +9,13 @@ export class NeodeInterceptor implements NestInterceptor {
     constructor(private readonly neode: Neode) {}
 
     intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-        const transaction: TransactionalService = this.neode.openTransaction()
+        const request = context.switchToHttp().getRequest()
+        let transaction: TransactionalService = request.method === "GET"
+            ? this.neode.openReadTransaction()
+            : this.neode.openWriteTransaction()
 
+
+        // Bind to Request
         context.switchToHttp().getRequest().transaction = transaction
 
         return next.handle()
