@@ -4,26 +4,32 @@ import { Neo4jErrorFilter } from 'nest-neo4j/dist';
 import { AppService } from './app.service';
 import { AuthUser } from './auth/decorators/user.decorator';
 import { CreateUserDto } from './auth/dto/create-user.dto';
+import { UserRepository } from './auth/repository/user.repository';
 import { User } from './auth/user/user.entity';
-import { FindEntity } from './ogm/decorators/find-entity.decorator';
-import { GetRepository } from './ogm/decorators/get-repository.decorator';
-import { InjectRepository } from './ogm/decorators/inject-repository.decorator';
-import { NeodeInterceptor } from './ogm/interceptors/neode.interceptor';
-import { TransactionManager } from './ogm/transaction.manager';
+import { FindEntity } from './neode/decorators/find-entity.decorator';
+import { GetRepository } from './neode/decorators/get-repository.decorator';
+import { NeodeInterceptor } from './neode/interceptors/neode.interceptor';
+import { NeodeService } from './neode/neode.service';
 
 @Controller()
+@UsePipes(ValidationPipe)
 @UseInterceptors(NeodeInterceptor)
 @UseFilters(Neo4jErrorFilter)
 export class AppController {
   constructor(
-    private neode: Neode,
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
-    private readonly transactionManager: TransactionManager,
+    // @InjectRepository(User) private readonly userRepository: Repository<User>,
+    private readonly neodeService: NeodeService
   ) {}
 
   @Get()
   async getHello() {
-    return this.userRepository.find('test')
+    const repo: UserRepository = this.neodeService.getRepository(User)
+
+    console.log(repo);
+
+    return repo.find('test')
+
+    // return this.userRepository.find('test')
   }
 
   @Get('/:userId')
@@ -33,7 +39,7 @@ export class AppController {
       return user
   }
 
-  @UsePipes(ValidationPipe)
+
   @Post('/')
   async postUser(
     @GetRepository({entity: User})
@@ -41,9 +47,10 @@ export class AppController {
     @Body()
     userDto: CreateUserDto
   ) {
+    // TODO: Move to service (or repo method)
     const user = User.create(userDto.email, userDto.password, userDto.firstName, userDto.lastName)
 
-    return userRepository.merge(user)
+    return userRepository.save(user)
   }
 
 }

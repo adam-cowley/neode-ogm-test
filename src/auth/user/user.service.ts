@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import Neode, { Repository } from "neodegm";
-import { InjectRepository } from "../../ogm/decorators/inject-repository.decorator";
+import { InjectRepository } from "../../neode/decorators/inject-repository.decorator";
 
 import { CreateUserDto } from "../dto/create-user.dto";
 import { UpdateUserDto } from "../dto/update-user.dto";

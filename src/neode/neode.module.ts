@@ -1,19 +1,17 @@
 import { DynamicModule, Module, Provider } from '@nestjs/common';
 import Neode, { fromEnv } from 'neodegm';
-import { User } from '../auth/user/user.entity';
-import { createNeodeProviders } from './neode.providers';
-import { TransactionManager } from './transaction.manager';
+import { NeodeService } from './neode.service';
 @Module({
-    providers: []
+    providers: [NeodeService]
 })
-export class OgmModule {
+export class NeodeModule {
     static fromEnv(entities: Function[] = [], database?: string): DynamicModule {
         require('dotenv').config()
 
-        const providers = createNeodeProviders(entities, database)
+        // const providers = createNeodeProviders(entities, database)
 
         return {
-            module: OgmModule,
+            module: NeodeModule,
             global: true,
 
             providers: [
@@ -21,14 +19,13 @@ export class OgmModule {
                     provide: Neode,
                     useFactory: (): Neode => fromEnv()
                 } as Provider<any>,
-                TransactionManager,
 
-                ...providers,
+                // ...providers,
             ],
             exports: [
                 Neode,
-                TransactionManager,
-                ...providers,
+                NeodeService,
+                // ...providers,
             ]
         }
     }
